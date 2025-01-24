@@ -15,7 +15,7 @@ export class AuthService {
 
     // Signup logic
     async signup(createUserDto: CreateUserDto): Promise<User> {
-        const { name, email, password } = createUserDto;
+        const { name, email, password, role } = createUserDto;
 
         // check if the email exists
         const existingUser = await this.userRepository.findOne({ where: {email} })
@@ -30,7 +30,8 @@ export class AuthService {
         const newUser = this.userRepository.create({
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            role: role || 'user'
         })
 
         return this.userRepository.save(newUser)

@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
+import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
 
 
 export class CreateUserDto {
@@ -12,4 +12,8 @@ export class CreateUserDto {
 
     @MinLength(6,{message: 'Password must be alteast 6 caharacters long' })
     password: string
+
+    @IsOptional() 
+    @IsIn(['user', 'admin', 'superadmin'])
+    role?: string;
 }
