@@ -13,7 +13,4 @@ export class CreateUserDto {
     @MinLength(6,{message: 'Password must be alteast 6 caharacters long' })
     password: string
 
-    @IsOptional() 
-    @IsIn(['user', 'admin', 'superadmin'])
-    role?: string;
 }

@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user-dto';
 import { LoginDto } from './dto/login.dto';
+import { UserRole } from 'src/common/enums/roles.enum';
 
 
 @Injectable()
@@ -18,7 +19,7 @@ export class AuthService {
 
     // Signup logic
     async signup(createUserDto: CreateUserDto): Promise<User> {
-        const { name, email, password, role } = createUserDto;
+        const { name, email, password } = createUserDto;
 
         // check if the email exists
         const existingUser = await this.userRepository.findOne({ where: {email} })
@@ -34,7 +35,8 @@ export class AuthService {
             name,
             email,
             password: hashedPassword,
-            role: role || 'user'
+            role: UserRole.User,
+            isDeleted: false
         })
 
         return this.userRepository.save(newUser)

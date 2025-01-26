@@ -25,4 +25,7 @@ export class User{
     @Column({ default: 'user' })
     role: string;
 
+    @Column({ default: false }) // Add `isDeleted` column
+    isDeleted: boolean;
+
 }
