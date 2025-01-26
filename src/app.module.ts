@@ -4,10 +4,6 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './common/guards/roles.guards';
-import { DashboardModule } from './dashboard/dashboard.module';
-import { MockUserMiddleware } from './middleware/MockUserMiddleware';
 
 
 @Module({
@@ -22,7 +18,7 @@ import { MockUserMiddleware } from './middleware/MockUserMiddleware';
       database: 'demo',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
-    }), AuthModule, DashboardModule,
+    }), AuthModule,
     
 // TypeOrmModule.forRootAsync({
 //   imports: [ConfigModule],
@@ -43,14 +39,6 @@ import { MockUserMiddleware } from './middleware/MockUserMiddleware';
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard, // Apply the RolesGuard globally
-    },
   ],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(MockUserMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}
