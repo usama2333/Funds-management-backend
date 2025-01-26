@@ -7,6 +7,11 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user-dto';
 import { LoginDto } from './dto/login.dto';
 import { UserRole } from 'src/common/enums/roles.enum';
+import * as crypto from 'crypto';
+import { CreatePasswordResetDto } from './dto/create-password-reset.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { PasswordReset } from './entities/password-reset.entity';
+import { MailerService } from '@nestjs-modules/mailer';
 
 
 @Injectable()
@@ -14,7 +19,12 @@ export class AuthService {
     constructor(
         @InjectRepository(User) //Inject the User repository
         private userRepository: Repository<User>,
-        private jwtService: JwtService
+
+        @InjectRepository(PasswordReset)
+        private passwordResetRepository: Repository<PasswordReset>,
+
+        private jwtService: JwtService,
+        private mailerService: MailerService  //inject mailer service
     ) {}
 
     // Signup logic
@@ -64,4 +74,66 @@ export class AuthService {
 
         return { accessToken }
     }
+
+    // Forgot Password - Generate reset token and send email
+    async forgotPassword(createPasswordResetDto: CreatePasswordResetDto) {
+        const { email } = createPasswordResetDto;
+
+        // check email in the user table
+        const user = await this.userRepository.findOne({ where: { email }})
+        if(!user) {
+            throw new BadRequestException('Email does not exist')
+        }
+         // Generate a unique token for the password reset
+        const token = crypto.randomBytes(32).toString('hex')
+        const expiresAt = new Date()
+        expiresAt.setHours(expiresAt.getHours() + 1)
+
+        // Save the token and expiration in the password_resets table
+        const passwordReset = this.passwordResetRepository.create({
+            email: user.email,
+            token,
+            expiresAt
+        })
+
+        await this.passwordResetRepository.save(passwordReset)
+
+         // Send an email with the reset link
+         const resetLink = `http://localhost:3000/auth/reset-password?token=${token}`;
+         await this.mailerService.sendMail({
+             to: email,
+             subject: 'Password Reset Request',
+             text: `Click this link to reset your password: ${resetLink}`,
+            html: `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`
+         });
+         return { message: 'Password reset email sent' };
+
+    }
+
+    async resetPassword(resetPasswordDto: ResetPasswordDto) {
+        const { token, newPassword} = resetPasswordDto
+
+        // check if token is vaild and expired
+        const passwordReset = await this.passwordResetRepository.findOne({ where: { token }})
+        if(!passwordReset || new Date() > passwordReset.expiresAt) {
+            throw new BadRequestException('Invalid or expired token')
+        }
+
+        const user = await this.userRepository.findOne({ where: { email: passwordReset.email}})
+        if(!user) {
+            throw new BadRequestException('User not found')
+        }
+
+        // Hashed password
+        const hashedPassword = await bcrypt.hash(newPassword,10)
+        user.password = hashedPassword;
+
+        await this.userRepository.save(user);
+
+        // Optionally, delete the token after it's been used
+        await this.passwordResetRepository.delete(passwordReset.id);
+        return { message: 'Updated password successfully' };
+    }
 }
+
+

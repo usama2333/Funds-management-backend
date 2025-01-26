@@ -3,6 +3,8 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user-dto';
 import { LoginDto } from './dto/login.dto';
 import { User } from './entities/user.entity';
+import { CreatePasswordResetDto } from './dto/create-password-reset.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth') //base route /auth
 export class AuthController {
@@ -19,5 +21,17 @@ export class AuthController {
     async login(@Body(ValidationPipe) loginDto: LoginDto) {
         return await this.authService.login(loginDto)
     }
+
+    // Forgot Password Route
+    @Post('forgot-password')
+    async forgotPassword(@Body(ValidationPipe) createPasswordResetDto: CreatePasswordResetDto) {
+      return await this.authService.forgotPassword(createPasswordResetDto)
+    }
+
+     // reset Password Route
+     @Post('reset-password')
+     async resetPassword(@Body(ValidationPipe) resetPasswordDto: ResetPasswordDto) {
+       return await this.authService.resetPassword(resetPasswordDto)
+     }
 
 }
