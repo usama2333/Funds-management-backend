@@ -7,6 +7,7 @@ import { PasswordReset } from './entities/password-reset.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService],
+  providers: [AuthService,JwtStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
