@@ -9,10 +9,11 @@ import {
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user-dto';
 import { LoginDto } from './dto/login.dto';
-import { User } from './entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { CreatePasswordResetDto } from './dto/create-password-reset.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+// import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guards';
 
 @Controller('auth') //base route /auth
 export class AuthController {

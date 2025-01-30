@@ -4,6 +4,10 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { AdminModule } from './admin/admin.module';
+// import { UserModule } from './user/user.module';
+// import { SeederService } from './seeder/seeder.service';
+import { User } from './user/entities/user.entity';
 
 
 @Module({
@@ -16,9 +20,9 @@ import { AuthModule } from './auth/auth.module';
       username: 'root',
       password: 'mysql123',
       database: 'demo',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      entities: [__dirname + '/**/*.entity{.ts,.js}', User],
       synchronize: true,
-    }), AuthModule,
+    }), AuthModule, AdminModule,
     
 // TypeOrmModule.forRootAsync({
 //   imports: [ConfigModule],
@@ -39,6 +43,7 @@ import { AuthModule } from './auth/auth.module';
   controllers: [AppController],
   providers: [
     AppService,
+    // SeederService
   ],
 })
 export class AppModule {}
